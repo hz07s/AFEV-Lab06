@@ -1,0 +1,44 @@
+class System
+instance variables
+  Purses : map Purse`CardId to Purse := {|->};
+  inv forall p in set dom Purses & Purses(p).GetCardNo() = p;
+  Log : seq of Transaction := [];
+
+types
+  public Transaction :: origen  : Purse`CardId
+                        destino : Purse`CardId
+                        sum     : nat;
+
+operations
+  public System : set of Purse ==> System
+  System(PurseSet) ==
+   (Purses := {p.GetCardNo() |-> p | p in set PurseSet};
+    return self)
+  pre forall p1, p2 in set PurseSet & p1 <> p2 => p1.GetCardNo() <> p2.GetCardNo();
+  public Transfer : Purse`CardId * Purse`CardId * nat ==> ()
+  Transfer(fromId, toId, sum) ==
+   (Purses(fromId).DecreaseBal(sum);
+    Purses(toId).IncreaseBal(sum);
+    Log := Log ^ [mk_Transaction(fromId, toId, sum)])
+  pre {fromId, toId} subset dom Purses and
+      fromId <> toId and
+      Purses(fromId).GetBalance() >= sum;
+
+  public TotalTransferred : () ==> nat
+  TotalTransferred() ==
+    return TotalSum(Log);
+
+functions
+  -- Recorre Log de forma recursiva y suma el campo sum.
+  TotalSum : seq of Transaction -> nat
+  TotalSum(log) ==
+    if log = [] then 0
+    else (hd log).sum + TotalSum(tl log);
+
+operations
+  -- Solo para pruebas: agrega el maplet sin validar la tarjeta.
+  public RegistrarSinValidar : Purse`CardId * Purse ==> ()
+  RegistrarSinValidar(id, pu) ==
+    Purses := Purses ++ {id |-> pu};
+
+end System

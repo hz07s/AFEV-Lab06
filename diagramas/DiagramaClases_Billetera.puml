@@ -1,0 +1,38 @@
+@startuml
+' Fuente alternativa en PlantUML del diagrama de clases (Ejercicio 1c)
+hide circle
+skinparam classAttributeIconSize 0
+
+class Purse {
+  - balance : nat
+  - cardNo : CardId
+  + Purse(newId : CardId, startbal : nat)
+  + IncreaseBal(sum : nat)
+  + DecreaseBal(sum : nat)
+  + GetBalance() : nat
+  + GetCardNo() : CardId
+}
+
+class System {
+  - Purses : map CardId to Purse
+  - Log : seq of Transaction
+  + System(PurseSet : set of Purse)
+  + Transfer(fromId : CardId, toId : CardId, sum : nat)
+  + TotalTransferred() : nat
+  + TotalSum(log : seq of Transaction) : nat
+}
+
+class Transaction <<record>> {
+  fromId : CardId
+  toId : CardId
+  sum : nat
+}
+
+System "1" o-- "0..*" Purse : Purses
+System "1" *-- "0..*" Transaction : Log
+note right of System
+  inv: forall p in set dom Purses &
+       Purses(p).GetCardNo() = p
+end note
+' La clave del map (CardId) puede dibujarse como asociacion calificada
+@enduml

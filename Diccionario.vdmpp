@@ -1,0 +1,74 @@
+class Diccionario
+
+types
+
+public Palabra = seq of char;
+
+instance variables
+
+  sinonimos : map Palabra to set of Palabra := {|->};
+
+  -- a) Ninguna palabra pertenece a su propio conjunto de sinonimos.
+  inv forall p in set dom sinonimos & p not in set sinonimos(p);
+
+  -- b) Simetria: si p2 esta en sinonimos(p1), p1 esta en sinonimos(p2).
+  inv forall p1 in set dom sinonimos &
+        forall p2 in set sinonimos(p1) &
+          p2 in set dom sinonimos and p1 in set sinonimos(p2);
+
+  -- c) Ninguna palabra registrada tiene el conjunto de sinonimos vacio.
+  inv forall p in set dom sinonimos & sinonimos(p) <> {};
+
+operations
+
+-- (d) Actualiza los dos sentidos en una sola asignacion.
+public AgregarSinonimo : Palabra * Palabra ==> ()
+AgregarSinonimo(p1, p2) ==
+  sinonimos := sinonimos ++ {p1 |-> Buscar(sinonimos, p1) union {p2},
+                             p2 |-> Buscar(sinonimos, p2) union {p1}}
+pre p1 <> p2;
+
+-- (e)
+public SonSinonimos : Palabra * Palabra ==> bool
+SonSinonimos(p1, p2) ==
+  return p1 in set dom sinonimos and p2 in set sinonimos(p1);
+
+-- (f)
+public SinonimosDe : Palabra ==> set of Palabra
+SinonimosDe(p) ==
+  return Buscar(sinonimos, p);
+
+-- (g)
+public CantidadPalabras : () ==> nat
+CantidadPalabras() ==
+  return card dom sinonimos;
+
+public ObtenerDiccionario : () ==> map Palabra to set of Palabra
+ObtenerDiccionario() ==
+  return sinonimos;
+
+functions
+
+-- Consulta total: evita aplicar el map fuera de su dominio.
+public Buscar : (map Palabra to set of Palabra) * Palabra -> set of Palabra
+Buscar(m, p) ==
+  if p in set dom m then m(p) else {};
+
+operations
+
+-- Solo para pruebas: rompe la invariante b) (relacion en un solo sentido).
+public AgregarUnSentido : Palabra * Palabra ==> ()
+AgregarUnSentido(p1, p2) ==
+  sinonimos := sinonimos ++ {p1 |-> Buscar(sinonimos, p1) union {p2}};
+
+-- Solo para pruebas: rompe la invariante a) (palabra sinonimo de si misma).
+public AgregarReflexivo : Palabra ==> ()
+AgregarReflexivo(p) ==
+  sinonimos := sinonimos ++ {p |-> Buscar(sinonimos, p) union {p}};
+
+-- Solo para pruebas: rompe la invariante c) (conjunto vacio).
+public AgregarVacio : Palabra ==> ()
+AgregarVacio(p) ==
+  sinonimos := sinonimos ++ {p |-> {}};
+
+end Diccionario

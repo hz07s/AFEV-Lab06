@@ -1,0 +1,26 @@
+class TiposMap
+
+types
+
+public PAIS = <France> | <Denmark> | <SouthAfrica> | <SaudiArabia>;
+
+values
+
+public m1 : map PAIS to nat = {<France>      |-> 9,
+                               <Denmark>     |-> 4,
+                               <SouthAfrica> |-> 2,
+                               <SaudiArabia> |-> 1};
+
+public m2 : map nat to nat = {1 |-> 2, 2 |-> 3, 3 |-> 4, 4 |-> 1};
+
+public Europe : set of PAIS = {<France>, <Denmark>};
+
+functions
+
+-- Devuelve el valor asociado a un PAIS en m1.
+-- El tipo del parametro impide pasar un literal fuera de PAIS.
+public ValorDe : PAIS -> nat
+ValorDe(p) ==
+  m1(p);
+
+end TiposMap

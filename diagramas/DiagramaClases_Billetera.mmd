@@ -1,0 +1,28 @@
+classDiagram
+  direction TB
+  class Purse {
+    -balance : nat
+    -cardNo : CardId
+    +Purse(newId : CardId, startbal : nat)
+    +IncreaseBal(sum : nat)
+    +DecreaseBal(sum : nat)
+    +GetBalance() nat
+    +GetCardNo() CardId
+  }
+  class System {
+    -Purses : map CardId to Purse
+    -Log : seq of Transaction
+    +System(PurseSet : set of Purse)
+    +Transfer(fromId : CardId, toId : CardId, sum : nat)
+    +TotalTransferred() nat
+    +TotalSum(log : seq of Transaction) nat
+  }
+  class Transaction {
+    <<record>>
+    fromId : CardId
+    toId : CardId
+    sum : nat
+  }
+  System "1" o-- "0..*" Purse : Purses (clave CardId)
+  System "1" *-- "0..*" Transaction : Log
+  note for System "inv: forall p in set dom Purses &<br/>Purses(p).GetCardNo() = p"

@@ -1,0 +1,71 @@
+class PruebaSystem
+
+instance variables
+
+  p1  : Purse;
+  p2  : Purse;
+  p3  : Purse;
+  sys : System;
+
+operations
+
+-- Tarjeta 1 con 100, tarjeta 2 con 50 y tarjeta 3 con 0.
+public PruebaSystem : () ==> PruebaSystem
+PruebaSystem() ==
+ (p1  := new Purse(mk_token(1), 100);
+  p2  := new Purse(mk_token(2), 50);
+  p3  := new Purse(mk_token(3), 0);
+  sys := new System({p1, p2, p3});
+  return self);
+
+public SaldosIniciales : () ==> seq of nat
+SaldosIniciales() ==
+  return [p1.GetBalance(), p2.GetBalance(), p3.GetBalance(),
+          sys.TotalTransferred()];
+
+public CasoNormal : () ==> seq of nat
+CasoNormal() ==
+ (sys.Transfer(mk_token(1), mk_token(2), 30);
+  sys.Transfer(mk_token(2), mk_token(3), 20);
+  return [p1.GetBalance(), p2.GetBalance(), p3.GetBalance(),
+          sys.TotalTransferred()]);
+
+-- Caso limite: la tarjeta 2 transfiere sus 50 completos a la tarjeta 3.
+public TransferirTodo : () ==> seq of nat
+TransferirTodo() ==
+ (sys.Transfer(mk_token(2), mk_token(3), 50);
+  return [p2.GetBalance(), p3.GetBalance(), sys.TotalTransferred()]);
+
+-- Falla pre_Transfer: fromId <> toId.
+public MismaTarjeta : () ==> seq of nat
+MismaTarjeta() ==
+ (sys.Transfer(mk_token(1), mk_token(1), 10);
+  return [p1.GetBalance()]);
+
+-- Falla pre_Transfer: la tarjeta 3 tiene saldo 0.
+public SaldoInsuficiente : () ==> seq of nat
+SaldoInsuficiente() ==
+ (sys.Transfer(mk_token(3), mk_token(1), 5);
+  return [p3.GetBalance()]);
+
+-- Falla pre_Transfer: mk_token(9) no esta en dom Purses.
+public TarjetaNoRegistrada : () ==> seq of nat
+TarjetaNoRegistrada() ==
+ (sys.Transfer(mk_token(9), mk_token(1), 5);
+  return [p1.GetBalance()]);
+
+-- Falla pre_System: dos billeteras distintas con la tarjeta 5.
+public TarjetasDuplicadas : () ==> nat
+TarjetasDuplicadas() ==
+ (dcl a : Purse := new Purse(mk_token(5), 10);
+  dcl b : Purse := new Purse(mk_token(5), 20);
+  dcl s : System := new System({a, b});
+  return s.TotalTransferred());
+
+-- Falla inv_System: la billetera de la tarjeta 1 bajo la clave 7.
+public InvarianteRota : () ==> nat
+InvarianteRota() ==
+ (sys.RegistrarSinValidar(mk_token(7), p1);
+  return sys.TotalTransferred());
+
+end PruebaSystem

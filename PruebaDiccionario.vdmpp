@@ -1,0 +1,83 @@
+class PruebaDiccionario
+
+types
+
+public Dicc = map Diccionario`Palabra to set of Diccionario`Palabra;
+
+instance variables
+
+  d : Diccionario;
+
+operations
+
+public PruebaDiccionario : () ==> PruebaDiccionario
+PruebaDiccionario() ==
+ (d := new Diccionario();
+  return self);
+
+-- rapido-veloz, rapido-agil, veloz-agil y feliz-contento.
+Cargar : () ==> ()
+Cargar() ==
+ (d.AgregarSinonimo("rapido", "veloz");
+  d.AgregarSinonimo("rapido", "agil");
+  d.AgregarSinonimo("veloz", "agil");
+  d.AgregarSinonimo("feliz", "contento"));
+
+public PruebaAgregar : () ==> Dicc
+PruebaAgregar() ==
+ (Cargar();
+  return d.ObtenerDiccionario());
+
+public PruebaRepetida : () ==> bool
+PruebaRepetida() ==
+ (dcl antes : Dicc := {|->};
+  Cargar();
+  antes := d.ObtenerDiccionario();
+  d.AgregarSinonimo("veloz", "rapido");
+  return antes = d.ObtenerDiccionario());
+
+public PruebaSonSinonimos : () ==> bool * bool * bool * bool
+PruebaSonSinonimos() ==
+ (Cargar();
+  return mk_(d.SonSinonimos("rapido", "veloz"),
+             d.SonSinonimos("veloz", "rapido"),
+             d.SonSinonimos("rapido", "feliz"),
+             d.SonSinonimos("lento", "rapido")));
+
+public PruebaSinonimosDe : () ==> seq of set of Diccionario`Palabra
+PruebaSinonimosDe() ==
+ (Cargar();
+  return [d.SinonimosDe("rapido"), d.SinonimosDe("contento"),
+          d.SinonimosDe("lento")]);
+
+public PruebaCantidad : () ==> seq of nat
+PruebaCantidad() ==
+ (dcl antes : nat := d.CantidadPalabras();
+  Cargar();
+  return [antes, d.CantidadPalabras()]);
+
+-- Falla pre_AgregarSinonimo: p1 <> p2.
+public PruebaMismaPalabra : () ==> nat
+PruebaMismaPalabra() ==
+ (d.AgregarSinonimo("sol", "sol");
+  return d.CantidadPalabras());
+
+-- Falla inv_Diccionario a): "sol" |-> {"sol"}.
+public PruebaInvA : () ==> Dicc
+PruebaInvA() ==
+ (d.AgregarReflexivo("sol");
+  return d.ObtenerDiccionario());
+
+-- Falla inv_Diccionario b): "rapido" |-> {"veloz"} sin registrar "veloz".
+public PruebaInvB : () ==> Dicc
+PruebaInvB() ==
+ (d.AgregarUnSentido("rapido", "veloz");
+  return d.ObtenerDiccionario());
+
+-- Falla inv_Diccionario c): "luna" |-> {}.
+public PruebaInvC : () ==> Dicc
+PruebaInvC() ==
+ (d.AgregarVacio("luna");
+  return d.ObtenerDiccionario());
+
+end PruebaDiccionario

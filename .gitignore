@@ -1,0 +1,13 @@
+# Material de apoyo: no forma parte de la entrega
+PRUEBAS.md
+INSTRUCCIONES.md
+
+# Trabajo auxiliar (salida real del interprete, notas y scripts)
+_work/
+
+# Capturas sueltas: ya van incrustadas en el informe
+capturas/
+
+# Borrador del informe y archivo suelto generado por VDM-VSCode
+AFEV LAB - 06.docx
+*.docx.vdmpp

@@ -1,0 +1,39 @@
+class Purse
+
+types
+
+public CardId = token;
+
+instance variables
+
+  balance : nat;
+  cardNo  : CardId;
+
+operations
+
+public Purse : CardId * nat ==> Purse
+Purse(newId, startbal) ==
+ (cardNo  := newId;
+  balance := startbal;
+  return self);
+
+public IncreaseBal : nat ==> ()
+IncreaseBal(sum) ==
+  balance := balance + sum;
+
+public DecreaseBal : nat ==> ()
+DecreaseBal(sum) ==
+  balance := balance - sum
+pre sum <= balance;
+
+-- pure: no cambian el estado y se invocan desde la invariante
+-- y desde la precondicion de System`Transfer.
+public pure GetBalance : () ==> nat
+GetBalance() ==
+  return balance;
+
+public pure GetCardNo : () ==> CardId
+GetCardNo() ==
+  return cardNo;
+
+end Purse
